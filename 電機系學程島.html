@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>電機系學程島</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#e8f4f8;--sea:#bfe3ef;--sand:#f3e2b3;--grass:#8fcf8a;--ink:#16323f;--card:#ffffff;--acc:#1b7f9e;--line:#9fc9d8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1c24;--sea:#143444;--sand:#6b5d3a;--grass:#2f6b3a;--ink:#e6f2f6;--card:#17303c;--acc:#5ec2e0;--line:#2c5568}}
+:root[data-theme="dark"]{--bg:#0e1c24;--sea:#143444;--sand:#6b5d3a;--grass:#2f6b3a;--ink:#e6f2f6;--card:#17303c;--acc:#5ec2e0;--line:#2c5568}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;line-height:1.6}
+main{max-width:860px;margin:0 auto;padding:16px}
+h1{font-size:1.4rem;margin:4px 0}
+.sub{margin:0 0 12px;opacity:.8;font-size:.9rem}
+svg{width:100%;height:auto;display:block;border-radius:16px}
+.p{cursor:pointer;outline:none}
+.p:hover .body,.p:focus .body,.p.on .body{stroke:var(--acc);stroke-width:4}
+.p text{font-size:13px;fill:#16323f;font-weight:700;text-anchor:middle}
+.bubble{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:12px}
+.who{font-weight:700;color:var(--acc);margin-bottom:4px}
+.row{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.tag{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.88rem}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+button{font:inherit;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:10px;padding:6px 12px;cursor:pointer}
+button:hover,button.on{border-color:var(--acc);background:var(--acc);color:#fff}
+.sem{font-weight:700;margin-top:8px}
+.note{font-size:.8rem;opacity:.7;margin-top:14px}
+</style>
+</head>
+<body>
+<main>
+<h1>電機系學程島</h1>
+<p class="sub">點島上的同學看各年級課程，或問系主任各領域在學什麼。</p>
+
+<svg viewBox="0 0 400 250" role="img" aria-label="學程島">
+<rect width="400" height="250" fill="var(--sea)"/>
+<ellipse cx="200" cy="140" rx="185" ry="100" fill="var(--sand)"/>
+<ellipse cx="200" cy="136" rx="160" ry="82" fill="var(--grass)"/>
+<g id="people"></g>
+</svg>
+
+<div class="bubble" id="box"></div>
+<div class="btns" id="fields"></div>
+<p class="note">課程依你提供的關聯圖整理；各領域的簡介與對應課程是依課名所做的一般說明，並非原圖標示，請以系上公告為準。</p>
+</main>
+
+<script>
+const Y={
+ '大一':{s:['計算機概論','計算機實習','普通物理','程式語言','普通物理實驗','微積分'],x:['普通物理','普通物理實驗','微積分','工程數學','電路學','交換電路與邏輯設計'],say:'打好數理與程式基礎，下學期開始接觸電路學。'},
+ '大二':{s:['工程數學','電磁學','線性代數','電路學','電子學','電工實驗'],x:['電子學','電工實驗','電磁波','訊號與系統','機率學','資料結構','複變函數'],say:'專業核心開始進場，電子學與電工實驗是重頭戲。'},
+ '大三':{s:['電子學','電工實驗','近代物理','自動控制','電機機械','通訊工程'],x:['電子電路','電工實驗','六選四（必選）'],say:'核心課程收尾，並從六門中必選四門，替領域鋪路。'},
+ '大四':{s:['電工實驗','依興趣深入六大領域之一'],x:[],say:'進入領域課程，往專長深耕。'}
+};
+const F={
+ '資訊科技':['軟體、演算法與計算機系統。','資料結構、程式語言、計算機概論'],
+ '電波':['電磁場、微波與天線。','電磁學、電磁波'],
+ '固態電子':['半導體元件與積體電路。','電子學、近代物理'],
+ '電力與電子電路':['電機機械、電力轉換與電路設計。','電機機械、電子電路、電路學'],
+ '控制':['讓系統穩定、精準地運作。','自動控制、訊號與系統'],
+ '通訊與訊號處理':['資訊如何傳送與處理。','通訊工程、機率學、訊號與系統']
+};
+const box=document.getElementById('box');
+const chips=a=>'<div class="row">'+a.map(t=>'<span class="tag">'+t+'</span>').join('')+'</div>';
+function show(html,el){document.querySelectorAll('.p,button').forEach(e=>e.classList.remove('on'));if(el)el.classList.add('on');box.innerHTML=html}
+function chair(msg){return '<div class="who">系主任</div>'+msg}
+function year(k,el){const d=Y[k];show('<div class="who">'+k+'同學</div>'+d.say+'<div class="sem">上學期</div>'+chips(d.s)+(d.x.length?'<div class="sem">下學期</div>'+chips(d.x):''),el)}
+function field(k,el){const d=F[k];show(chair('「'+k+'領域」：'+d[0])+'<div class="sem">相關課程（依課名推測）</div>'+chips(d[1].split('、')),el)}
+function grad(el){show(chair('碩士班同樣分為六組，另有專業必修、專業選修、專題討論（4 學分）與畢業論文（6 學分）。')+chips(Object.keys(F).map(k=>k+'組')),el)}
+function person(x,y,c,label,fn){
+ const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.setAttribute('class','p');g.setAttribute('tabindex','0');g.setAttribute('role','button');
+ g.innerHTML='<g class="body"><circle cx="'+x+'" cy="'+(y-26)+'" r="11" fill="#ffd9b8"/><rect x="'+(x-13)+'" y="'+(y-14)+'" width="26" height="30" rx="10" fill="'+c+'"/></g><text x="'+x+'" y="'+(y+32)+'">'+label+'</text>';
+ g.onclick=()=>fn(g);g.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')fn(g)};
+ document.getElementById('people').appendChild(g);
+}
+person(90,110,'#e8735a','大一',g=>year('大一',g));
+person(150,150,'#f2b134','大二',g=>year('大二',g));
+person(250,150,'#4fae6a','大三',g=>year('大三',g));
+person(310,110,'#6b7fd6','大四',g=>year('大四',g));
+person(200,100,'#16323f','系主任',g=>show(chair('歡迎來到電機系學程島！點同學看課程，或按下方領域按鈕，我來介紹。'),g));
+Object.keys(F).forEach(k=>{const b=document.createElement('button');b.textContent=k;b.onclick=()=>field(k,b);document.getElementById('fields').appendChild(b)});
+const gb=document.createElement('button');gb.textContent='碩士班';gb.onclick=()=>grad(gb);document.getElementById('fields').appendChild(gb);
+show(chair('歡迎來到電機系學程島！點同學看課程，或按下方領域按鈕，我來介紹。'));
+</script>
+</body>
+</html>
